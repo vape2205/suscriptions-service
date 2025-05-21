@@ -21,7 +21,7 @@ builder.Services.AddScoped<ISuscripcionService, SuscripcionService>();
 builder.Services.AddScoped<ISuscripcionRepository, SuscripcionRepository>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AppDb")));
+    options.UseSqlite(builder.Configuration.GetConnectionString("AppDb")));
 
 // JWT
 var jwtSettingsConfiguration = builder.Configuration.GetSection("AccessTokenSettings");
