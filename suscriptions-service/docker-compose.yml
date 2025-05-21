@@ -1,0 +1,48 @@
+services:
+  suscriptions.api:
+    image: ${DOCKER_REGISTRY-}suscriptionsapi
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+        ConnectionStrings__AppDb: ${SUSCRIPTIONS_DB_CONNECTIONSTRING}
+        AccessTokenSettings__publicKey: ${AUTH_RSA_PUBLICKEY}
+        AccessTokenSettings__Issuer: http://localhost:5000
+        AccessTokenSettings__Audience: http://localhost:6001
+    ports:
+      - "${SUSCRIPTIONS_PORT}:8080"
+    depends_on:
+      - db-suscriptions
+    networks:
+      - app-suscriptions
+
+  db-suscriptions:
+    image: mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-18.04
+    container_name: db-sqlserver
+    networks:
+      - app-suscriptions
+    restart: always
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: ${SUSCRIPTIONS_DB_PASSWORD}
+      MSSQL_DATA_DIR: /var/opt/mssql/data
+      MSSQL_PID: 'Developer' 
+      MSSQL_TCP_PORT: 1433 
+    ports:
+      - '${SUSCRIPTIONS_DB_PORT}:1433'
+    volumes:
+      - sql-server-data:/var/opt/mssql/
+      - sqldata:/var/opt/sqlserver/data
+      - sqllog:/var/opt/sqlserver/log
+      - sqlbackup:/var/opt/sqlserver/backup
+      - /c/docker/shared:/usr/shared
+
+volumes:
+  sql-server-data:
+    driver: local
+  sqldata:
+  sqllog:
+  sqlbackup:
+  
+networks:
+    app-suscriptions:
